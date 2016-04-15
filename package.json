@@ -1,0 +1,23 @@
+{
+  "name": "dwservice",
+  "version": "1.0.0",
+  "description": "A micro-service management framework for Node.JS.",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "colors": "^1.1.2",
+    "express": "^4.13.4",
+    "jsonfile": "^2.2.3",
+    "request": "^2.70.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "micro-service",
+    "Node.js"
+  ],
+  "author": "Daniel Wang",
+  "license": "MIT"
+}
