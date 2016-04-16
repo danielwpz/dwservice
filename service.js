@@ -12,6 +12,7 @@ var logger = require('./logger.js');
 var log = new logger('Daniel', 'service.js');
 var fusewire = require('./fusewire.js');
 
+var default_lb = require('./roundlb.js');
 
 /**** Consume ****/
 
@@ -46,13 +47,14 @@ function parseURL(url, p) {
 	return result;
 }
 
-function buildHandler(inface, i, host, keys) {
+function buildHandler(inface, i, lb, keys) {
 	// wrap of send request and handle error
 	var send = function (param, body, cb, cnt) {
 		// parse params and url
 		var method = inface.services[keys[i]][0];
-		var url = inface.services[keys[i]][1];
-		url = host + parseURL(url, param);
+		var host = lb.pickNext();
+		var path = inface.services[keys[i]][1];
+		var url = host + parseURL(path, param);
 
 		// fusewire
 		if (! inface.fuses[url]) {
@@ -115,7 +117,8 @@ function buildHandler(inface, i, host, keys) {
 	// corresponding method of 'inface',
 	// called by the user
 	var f = function (param, body, cb) {
-		send(param, body, cb, 3);
+		var max_try = lb.getHosts().length;
+		send(param, body, cb, max_try);
 	}
 
 
@@ -200,7 +203,7 @@ var doStart = function(obj) {
 /**
  * infaceJSON: string path to a json file
  */
-function Service(infaceJSON) {
+function Service(infaceJSON, options) {
 	var file = fs.readFileSync(infaceJSON, 'utf8');
 	file = file.replace(/(\r\n|\n|\r|\t)/gm, '');
 	var obj = JSON.parse(file);
@@ -213,14 +216,20 @@ function Service(infaceJSON) {
 		// add consuming functions
 		obj._request = require('request');
 		var keys = Object.keys(obj.services);
-		var host = obj.hosts[0]; //TODO pick a host
+
+		// server picker
+		if (!!options && !!options.lb) {
+			obj._lb = options.lb;
+		}else {
+			obj._lb = new default_lb(obj.hosts);
+		}
 
 		// add fusewire list
 		obj.fuses = {};
 
 		var i;
 		for (i = 0; i < keys.length; i++) {
-			obj[keys[i]] = buildHandler(obj, i, host, keys); 
+			obj[keys[i]] = buildHandler(obj, i, obj._lb, keys); 
 		}
 
 

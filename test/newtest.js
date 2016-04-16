@@ -33,15 +33,3 @@ test.start(8080, function() {
 
 	});
 });
-
-// test
-var request = require('request');
-
-request({
-	uri: 'http://localhost:9000',
-	timeout: 3000
-}, function(err, res, body) {
-	console.log('err:' + err.code);
-	console.log('res:' + res);
-	console.log('body:' + body);
-});
