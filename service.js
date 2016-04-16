@@ -47,7 +47,8 @@ function parseURL(url, p) {
 }
 
 function buildHandler(inface, i, host, keys) {
-	var f = function (param, body, cb) {
+	// wrap of send request and handle error
+	var send = function (param, body, cb, cnt) {
 		// parse params and url
 		var method = inface.services[keys[i]][0];
 		var url = inface.services[keys[i]][1];
@@ -94,16 +95,29 @@ function buildHandler(inface, i, host, keys) {
 		function (err, res, body) {
 			if (!! err) {
 				log.error("Request " + url + " : " + err);
-
 				fuse.increaseFailure();
+
+				if (cnt > 0) {
+					// try another host
+					log.debug('Try another host for ' + url);
+					send(param, body, cb, cnt - 1);
+				}else {
+					// all host unavailable
+					cb(err, res, body);
+				}
 			}else {
 				fuse.reset();
+				cb(err, res, body);
 			}
-
-
-			cb(err, res, body);
 		});
 	};
+
+	// corresponding method of 'inface',
+	// called by the user
+	var f = function (param, body, cb) {
+		send(param, body, cb, 3);
+	}
+
 
 	return f;
 }
