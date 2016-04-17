@@ -1,6 +1,6 @@
 {
   "name": "dwservice",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A micro-service management framework for Node.JS.",
   "main": "index.js",
   "dependencies": {
