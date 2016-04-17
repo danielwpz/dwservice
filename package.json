@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "A micro-service management framework for Node.JS.",
   "main": "index.js",
+  "repository": {
+	"type": "git", 
+	"url": "https://github.com/danielwpz/dwservice"
+  },
   "dependencies": {
     "body-parser": "^1.15.0",
     "colors": "^1.1.2",
